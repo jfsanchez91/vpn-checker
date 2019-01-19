@@ -1,0 +1,4 @@
+dbus-python==1.2.8
+netifaces==0.10.9
+notify2==0.3.1
+pkg-resources==0.0.0
