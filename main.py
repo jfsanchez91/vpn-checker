@@ -3,6 +3,7 @@
 import netifaces
 import time
 import sys
+import re
 
 import env
 import logger
@@ -10,7 +11,7 @@ from internet import is_internet_connected, force_connect_vpn
 from error import show_error_notification, syslog
 
 
-_DEFAULT_GATEWAYS = ('172.18.1.53', '10.10.1.100')
+_DEFAULT_GATEWAYS = ('172.18.1.[\d]+', '10.10.1.100')
 _DEFAULT_VPN_NAME = 'SyrconVPN'
 SLEEP_TIME = 10   # seconds
 
@@ -22,12 +23,18 @@ logger.debug(f'AVAILABLE_GATEWAYS = {AVAILABLE_GATEWAYS}')
 logger.debug(f'FORCE_CONNECT = {FORCE_CONNECT}')
 logger.debug(f'VPN_NAME = {VPN_NAME}')
 
+
+_gateways = list(map(re.compile, map(lambda x: x + '$' if not x.endswith('$') else x, map(lambda x: x.replace('.', '\.'), _DEFAULT_GATEWAYS))))
+
+def match(ip: str):
+    return any(map(lambda x: x.match(ip), _gateways))
+
 def check_vpn_status():
     gateways = netifaces.gateways()
     defaults = gateways['default']
     for gateway in defaults:
         ip,_ = defaults[gateway]
-        if ip not in AVAILABLE_GATEWAYS and is_internet_connected():
+        if not match(ip) and is_internet_connected():
             if FORCE_CONNECT:
                 force_connect_vpn(VPN_NAME)
             else:
