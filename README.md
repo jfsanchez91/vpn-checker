@@ -36,7 +36,7 @@
 	Type=simple
 	Restart=always
 	RestartSec=1
-	User=jfsanchez
+	User=<TYPE YOUR USERNAME HERE>
 	Environment="DISPLAY=:0.0"
 	Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
 	ExecStart=$VIRTUALENV_PATH/bin/python $SOURCES_PATH/main.py
